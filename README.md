@@ -7,9 +7,14 @@ This is a backend designed to interact with the canvas API, and get a set of JSO
 # Development Environment
 
 Programmed using NodeJS v16.15.1
+
 Utilizing ExpressJS v4.18.2
+
 Utilizing Axios v1.3.3
+
 Utilizing DotEnv v16.0.3
+
+Utilizing Cors v2.8.5
 
 # Useful Websites
 
