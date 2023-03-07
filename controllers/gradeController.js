@@ -179,7 +179,7 @@ const getAssignmentGrades = async (allAssignments) => {
 
 // Grade a score percentage using the specified grading scheme
 const grade = (grade_percentage, grading_scheme) => {
-    grade_letter = '';
+    var grade_letter = '';
     for (var i = grading_scheme.length - 1; i >= 0; i--) {
         if (grade_percentage >= grading_scheme[i].value) {
             grade_letter = grading_scheme[i].name;
@@ -205,16 +205,23 @@ const returnFromEnrollmentsByCourseId = (enrollments, courses, gradingStandards,
 
         const gradingStandard = (courseGradingStandardsIndex === -1 || gradingStandardIndex === -1) ? defaultGradingStandard: gradingStandards[courseGradingStandardsIndex].grading_schemes[gradingStandardIndex];
 
-        grade_letter = grade(enrollment.grade_percentage, gradingStandard.grading_scheme);
+        course_grade_letter = grade(enrollment.grade_percentage, gradingStandard.grading_scheme);
 
         const assignmentIndex = assignmentGrades.findIndex(courseAssignments => courseAssignments.course_id === enrollment.id);
         const assignments = assignmentGrades[assignmentIndex];
+
+        // Here we calculate the grade percentage and letter grade for each assignment
+        const assignmentData = assignments.assignment_data.map((assignment) => {
+            assignment.grade_percentage = (assignment.score / assignment.points_possible) * 100;
+            assignment.grade_letter = grade(assignment.grade_percentage, gradingStandard.grading_scheme);
+            return assignment;
+        });
 
         return {
             'course_id': enrollment.id,
             'course_name': courses[courseIndex].name,
             'grade_percentage': enrollment.grade_percentage,
-            'grade_letter': grade_letter,
+            'grade_letter': course_grade_letter,
             'assignments': assignments.assignment_data
         };
     });
