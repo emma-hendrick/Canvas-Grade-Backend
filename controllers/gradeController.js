@@ -40,7 +40,7 @@ const forActiveEnrollments = async (next, enrollments) => {
 // This will call next(data, err) for the first {assignments} assignments from the canvas API
 const forPastAssignments = async (next, assignments, courses) => {
     const assignmentsByCourse = courses.map(async (course) => {
-        return axios.get(`${apiTarget}/users/self/courses/${course.id}/assignments?bucket=past&per_page=${assignments}`)
+        return axios.get(`${apiTarget}/users/self/courses/${course.id}/assignments?per_page=${assignments}`)
         .then(res => {
 
             return next(res.data, false, course.id);
@@ -148,6 +148,7 @@ const getAssignmentGrade = async (assignment, course_id) => {
         } 
 
         assignment.score = res.data.score || 0;
+        assignment.workflow_state = res.data.workflow_state;
         return assignment;
 
     })
@@ -179,12 +180,10 @@ const getAssignmentGrades = async (allAssignments) => {
 
 // Grade a score percentage using the specified grading scheme
 const grade = (grade_percentage, grading_scheme) => {
-    var grade_letter = '';
-    for (var i = grading_scheme.length - 1; i >= 0; i--) {
-        if (grade_percentage >= grading_scheme[i].value) {
+    let grade_letter = '';
+    for (var i = 0; i < grading_scheme.length; i++) {
+        if (grade_percentage >= (grading_scheme[i].value * 100)) {
             grade_letter = grading_scheme[i].name;
-        }
-        else {
             break;
         }
     }
@@ -212,7 +211,7 @@ const returnFromEnrollmentsByCourseId = (enrollments, courses, gradingStandards,
 
         // Here we calculate the grade percentage and letter grade for each assignment
         const assignmentData = assignments.assignment_data.map((assignment) => {
-            assignment.grade_percentage = (assignment.score / assignment.points_possible) * 100;
+            assignment.grade_percentage = Math.round((assignment.score / assignment.points_possible) * 10000 + Number.EPSILON) / 100;
             assignment.grade_letter = grade(assignment.grade_percentage, gradingStandard.grading_scheme);
             return assignment;
         });
@@ -236,51 +235,51 @@ const getGrades = async (req, res) => {
             'grading_scheme': [
                 {
                     'name': 'A',
-                    'value': 94,
+                    'value': 0.94,
                 },
                 {
                     'name': 'A-',
-                    'value': 90,
+                    'value': 0.90,
                 },
                 {
                     'name': 'B+',
-                    'value': 87,
+                    'value': 0.87,
                 },
                 {
                     'name': 'B',
-                    'value': 84,
+                    'value': 0.84,
                 },
                 {
                     'name': 'B-',
-                    'value': 80,
+                    'value': 0.80,
                 },
                 {
                     'name': 'C+',
-                    'value': 77,
+                    'value': 0.77,
                 },
                 {
                     'name': 'C',
-                    'value': 74,
+                    'value': 0.74,
                 },
                 {
                     'name': 'C-',
-                    'value': 70,
+                    'value': 0.70,
                 },
                 {
                     'name': 'D+',
-                    'value': 67,
+                    'value': 0.67,
                 },
                 {
                     'name': 'D',
-                    'value': 64,
+                    'value': 0.64,
                 },
                 {
                     'name': 'D-',
-                    'value': 61,
+                    'value': 0.61,
                 },
                 {
                     'name': 'F',
-                    'value': 0,
+                    'value': 0.0,
                 },
             ]
         };
