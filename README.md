@@ -4,6 +4,10 @@ This is a backend designed to interact with the canvas API, and get a set of JSO
 
 [Get all of your canvas grades at once!](https://youtu.be/PMaFMreImT4)
 
+# Env Configuration
+PORT=%%%
+CANVAS_TOKEN=%%%
+
 # Development Environment
 
 Programmed using NodeJS v16.15.1

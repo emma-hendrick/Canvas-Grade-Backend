@@ -137,6 +137,13 @@ const getCourseGradingStandards = async (courses) => {
     return await Promise.all(standardsByCourse);
 };
 
+// So we don't get rate limited
+const sleep = (ms) => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+
 // Get the score for an individual assignment
 const getAssignmentGrade = async (assignment, course_id) => {
     return axios.get(`${apiTarget}/courses/${course_id}/assignments/${assignment.id}/submissions/self`)
@@ -166,6 +173,7 @@ const getAssignmentGrades = async (allAssignments) => {
         var assignmentGrades = [];
         for (const assignment of assignments.assignment_data) {
             assignmentGrades.push(getAssignmentGrade(assignment, assignments.course_id));
+            await sleep(10);
         };
 
         assignmentsGrades.push(
